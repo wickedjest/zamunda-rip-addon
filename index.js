@@ -1,4 +1,4 @@
-const { addonBuilder } = require("stremio-addon-sdk");const { addonBuilder } = require("stremio-addon-sdk");
+const { addonBuilder } = require("stremio-addon-sdk");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const express = require("express");
@@ -108,3 +108,4 @@ const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => {
     console.log("Addon running on port " + PORT);
 });
+
