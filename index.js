@@ -1,6 +1,7 @@
 const { addonBuilder } = require("stremio-addon-sdk");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const express = require("express");
 
 const BASE = "https://zamunda.rip";
 
@@ -76,15 +77,20 @@ builder.defineStreamHandler(async ({ id }) => {
 });
 
 // ------------------------------
-// HTTP SERVER (важно за Render)
+// EXPRESS SERVER (работи в Render)
 // ------------------------------
-const http = require("http");
+const app = express();
+const addonInterface = builder.getInterface();
 
-const server = http.createServer((req, res) => {
-    builder.getInterface().serveHTTP(req, res);
+app.get("/:resource/:type/:id.json", (req, res) => {
+    addonInterface.get(req, res);
+});
+
+app.get("/manifest.json", (req, res) => {
+    res.send(addonInterface.manifest);
 });
 
 const PORT = process.env.PORT || 7000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log("Addon running on port " + PORT);
 });
