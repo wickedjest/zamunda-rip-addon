@@ -75,4 +75,16 @@ builder.defineStreamHandler(async ({ id }) => {
     };
 });
 
-module.exports = builder.getInterface();
+// ------------------------------
+// HTTP SERVER (важно за Render)
+// ------------------------------
+const http = require("http");
+
+const server = http.createServer((req, res) => {
+    builder.getInterface().serveHTTP(req, res);
+});
+
+const PORT = process.env.PORT || 7000;
+server.listen(PORT, () => {
+    console.log("Addon running on port " + PORT);
+});
