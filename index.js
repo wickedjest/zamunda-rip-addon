@@ -1,29 +1,40 @@
-const { addonBuilder } = require("stremio-addon-sdk");
+const { addonBuilder } = require("stremio-addon-sdk");const { addonBuilder } = require("stremio-addon-sdk");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const express = require("express");
 
 const BASE = "https://zamunda.rip";
 
+// ------------------------------
+// VALID STREMIO MANIFEST
+// ------------------------------
 const manifest = {
-    id: "zamunda-rip-all",
+    id: "community.zamunda.rip.all",
     version: "1.0.0",
-    name: "Zamunda All Torrents",
-    description: "Единен каталог с всички торенти от zamunda.rip",
-    types: ["other"],
+    name: "Zamunda RIP All Torrents",
+    description: "Каталог с всички торенти от zamunda.rip",
+    logo: "https://www.stremio.com/website/stremio-logo-small.png",
+
+    types: ["movie"],
+
+    resources: ["catalog", "stream"],
+
     catalogs: [
         {
-            type: "other",
+            type: "movie",
             id: "zamunda-all",
             name: "Zamunda All Torrents"
         }
     ],
-    resources: ["catalog", "stream"]
+
+    idPrefixes: [""]
 };
 
 const builder = new addonBuilder(manifest);
 
-// Скрейпване на началната страница
+// ------------------------------
+// SCRAPER
+// ------------------------------
 async function scrapeAll() {
     const res = await axios.get(BASE);
     const $ = cheerio.load(res.data);
@@ -38,10 +49,9 @@ async function scrapeAll() {
         if (title && link) {
             items.push({
                 id: link,
-                type: "other",
+                type: "movie",
                 name: title,
-                poster: "https://via.placeholder.com/300x450",
-                magnet: magnet || null
+                poster: "https://via.placeholder.com/300x450"
             });
         }
     });
@@ -49,13 +59,17 @@ async function scrapeAll() {
     return items;
 }
 
-// Catalog handler
-builder.defineCatalogHandler(async () => {
+// ------------------------------
+// CATALOG HANDLER
+// ------------------------------
+builder.defineCatalogHandler(async ({ type, id }) => {
     const items = await scrapeAll();
     return { metas: items };
 });
 
-// Stream handler
+// ------------------------------
+// STREAM HANDLER
+// ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
     const fullUrl = BASE + id;
 
@@ -77,17 +91,17 @@ builder.defineStreamHandler(async ({ id }) => {
 });
 
 // ------------------------------
-// EXPRESS SERVER (работи в Render)
+// EXPRESS SERVER (REQUIRED FOR RENDER)
 // ------------------------------
 const app = express();
 const addonInterface = builder.getInterface();
 
-app.get("/:resource/:type/:id.json", (req, res) => {
-    addonInterface.get(req, res);
-});
-
 app.get("/manifest.json", (req, res) => {
     res.send(addonInterface.manifest);
+});
+
+app.get("/:resource/:type/:id.json", (req, res) => {
+    addonInterface.get(req, res);
 });
 
 const PORT = process.env.PORT || 7000;
