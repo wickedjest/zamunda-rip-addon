@@ -94,12 +94,21 @@ builder.defineStreamHandler(async ({ id }) => {
 // EXPRESS SERVER (REQUIRED FOR RENDER)
 // ------------------------------
 const app = express();
-const addonInterface = builder.getInterface();
 
-app.get("/manifest.json", (req, res) => {
-    res.send(addonInterface.manifest);
+// CORS за Stremio
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    next();
 });
 
+const addonInterface = builder.getInterface();
+
+// Manifest
+app.get("/manifest.json", (req, res) => {
+    res.json(addonInterface.manifest);
+});
+
+// Catalog / Stream
 app.get("/:resource/:type/:id.json", (req, res) => {
     addonInterface.get(req, res);
 });
@@ -108,4 +117,3 @@ const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => {
     console.log("Addon running on port " + PORT);
 });
-
