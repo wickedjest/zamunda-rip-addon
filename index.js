@@ -124,6 +124,17 @@ app.get("/:resource/:type/:id.json", (req, res) => {
     addonInterface.get(req, res);
 });
 
+// ------------------------------
+// GLOBAL ERROR HANDLERS (ФИКСВА UNHANDLED REJECTION)
+// ------------------------------
+process.on("unhandledRejection", (reason) => {
+    console.error("GLOBAL Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+    console.error("GLOBAL Uncaught Exception:", err);
+});
+
 const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => {
     console.log("Addon running on port " + PORT);
