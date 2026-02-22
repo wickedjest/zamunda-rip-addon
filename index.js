@@ -32,7 +32,7 @@ const manifest = {
 const builder = new addonBuilder(manifest);
 
 // ------------------------------
-// SCRAPER (СТАБИЛЕН)
+// SCRAPER
 // ------------------------------
 async function scrapeAll() {
     try {
@@ -65,7 +65,7 @@ async function scrapeAll() {
 // ------------------------------
 // CATALOG HANDLER
 // ------------------------------
-builder.defineCatalogHandler(async () => {
+builder.defineCatalogHandler(async ({ type, id, extra }) => {
     try {
         const items = await scrapeAll();
         return { metas: items };
@@ -76,9 +76,9 @@ builder.defineCatalogHandler(async () => {
 });
 
 // ------------------------------
-// META HANDLER (FIXES "No handler" error)
+// META HANDLER (fixes "No handler")
 // ------------------------------
-builder.defineMetaHandler(async ({ id }) => {
+builder.defineMetaHandler(async ({ type, id, extra }) => {
     return {
         meta: {
             id,
@@ -92,7 +92,7 @@ builder.defineMetaHandler(async ({ id }) => {
 // ------------------------------
 // STREAM HANDLER
 // ------------------------------
-builder.defineStreamHandler(async ({ id }) => {
+builder.defineStreamHandler(async ({ type, id, extra }) => {
     try {
         const fullUrl = BASE + id;
 
@@ -122,7 +122,6 @@ builder.defineStreamHandler(async ({ id }) => {
 // ------------------------------
 const app = express();
 
-// CORS
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     next();
@@ -149,7 +148,7 @@ process.on("uncaughtException", (err) => {
     console.error("GLOBAL Uncaught Exception:", err);
 });
 
-const PORT = process.env.PORT || 7000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log("Addon running on port " + PORT);
 });
