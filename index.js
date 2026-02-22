@@ -34,13 +34,14 @@ async function scrapeAll() {
 
         const items = [];
 
-        $("tr").each((i, el) => {
-            const title = $(el).find("a[href*='details']").text().trim();
-            const link = $(el).find("a[href*='details']").attr("href");
+        // Новата структура на Zamunda.rip
+        $(".torrent-row").each((i, el) => {
+            const title = $(el).find(".torrent-name a").text().trim();
+            const link = $(el).find(".torrent-name a").attr("href");
 
             if (title && link) {
                 items.push({
-                    id: link,
+                    id: link.replace(BASE, ""),   // важно за Stremio
                     type: "movie",
                     name: title,
                     poster: "https://via.placeholder.com/300x450"
@@ -153,3 +154,4 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log("Addon running on port " + PORT);
 });
+
