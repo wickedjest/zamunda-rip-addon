@@ -63,7 +63,7 @@ async function scrapeAll() {
 }
 
 // ------------------------------
-// UNIVERSAL CATALOG HANDLER
+// CATALOG HANDLER
 // ------------------------------
 builder.defineCatalogHandler(async ({ type, id, extra, skip, search }) => {
     try {
@@ -141,23 +141,15 @@ app.get("/manifest.json", (req, res) => {
     res.json(addonInterface.manifest);
 });
 
-// UNIVERSAL ROUTE — FIXES ALL "No handler" ERRORS
+// UNIVERSAL ROUTE
 app.get("/*", (req, res) => {
     addonInterface.get(req, res);
 });
 
 // ------------------------------
-// GLOBAL ERROR HANDLERS
+// FIX FOR RENDER — LISTEN ON 0.0.0.0
 // ------------------------------
-process.on("unhandledRejection", (reason) => {
-    console.error("GLOBAL Unhandled Rejection:", reason);
-});
-
-process.on("uncaughtException", (err) => {
-    console.error("GLOBAL Uncaught Exception:", err);
-});
-
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log("Addon running on port " + PORT);
 });
