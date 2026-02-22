@@ -101,6 +101,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// REQUIRED BY RENDER
+app.get("/", (req, res) => {
+    res.send("Zamunda RIP Addon is running");
+});
+
 const addonInterface = builder.getInterface();
 
 app.get("/manifest.json", (req, res) => {
@@ -111,8 +116,7 @@ app.get("/*", (req, res) => {
     addonInterface.get(req, res);
 });
 
-// 🔥 FIX: SUPPRESS NODE CRASH
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
     console.log("Suppressed unhandled rejection:", reason);
 });
 
@@ -124,3 +128,4 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log("Addon running on port " + PORT);
 });
+
