@@ -141,13 +141,13 @@ app.get("/manifest.json", (req, res) => {
     res.json(addonInterface.manifest);
 });
 
-// UNIVERSAL ROUTE
+// UNIVERSAL ROUTE — REQUIRED FOR STREMIO
 app.get("/*", (req, res) => {
     addonInterface.get(req, res);
 });
 
 // ------------------------------
-// FIX FOR RENDER — LISTEN ON 0.0.0.0
+// LISTEN ON 0.0.0.0 FOR RENDER
 // ------------------------------
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
