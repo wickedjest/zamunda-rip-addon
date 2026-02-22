@@ -32,7 +32,7 @@ const manifest = {
 const builder = new addonBuilder(manifest);
 
 // ------------------------------
-// SCRAPER
+// SCRAPER (СТАБИЛЕН)
 // ------------------------------
 async function scrapeAll() {
     try {
@@ -63,7 +63,7 @@ async function scrapeAll() {
 }
 
 // ------------------------------
-// CATALOG HANDLER
+// CATALOG HANDLER (СТАБИЛЕН)
 // ------------------------------
 builder.defineCatalogHandler(async ({ type, id }) => {
     try {
@@ -76,7 +76,7 @@ builder.defineCatalogHandler(async ({ type, id }) => {
 });
 
 // ------------------------------
-// STREAM HANDLER
+// STREAM HANDLER (СТАБИЛЕН)
 // ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
     try {
