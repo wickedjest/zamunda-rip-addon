@@ -6,7 +6,7 @@ const express = require("express");
 const BASE = "https://zamunda.rip";
 
 // ------------------------------
-// VALID STREMIO MANIFEST
+// MANIFEST
 // ------------------------------
 const manifest = {
     id: "community.zamunda.rip.all",
@@ -16,7 +16,6 @@ const manifest = {
     logo: "https://www.stremio.com/website/stremio-logo-small.png",
 
     types: ["movie"],
-
     resources: ["catalog", "stream"],
 
     catalogs: [
@@ -36,58 +35,72 @@ const builder = new addonBuilder(manifest);
 // SCRAPER
 // ------------------------------
 async function scrapeAll() {
-    const res = await axios.get(BASE);
-    const $ = cheerio.load(res.data);
+    try {
+        const res = await axios.get(BASE, { timeout: 10000 });
+        const $ = cheerio.load(res.data);
 
-    const items = [];
+        const items = [];
 
-    $("tr").each((i, el) => {
-        const title = $(el).find("a[href*='details']").text().trim();
-        const link = $(el).find("a[href*='details']").attr("href");
-        const magnet = $(el).find("a[href*='magnet']").attr("href");
+        $("tr").each((i, el) => {
+            const title = $(el).find("a[href*='details']").text().trim();
+            const link = $(el).find("a[href*='details']").attr("href");
 
-        if (title && link) {
-            items.push({
-                id: link,
-                type: "movie",
-                name: title,
-                poster: "https://via.placeholder.com/300x450"
-            });
-        }
-    });
+            if (title && link) {
+                items.push({
+                    id: link,
+                    type: "movie",
+                    name: title,
+                    poster: "https://via.placeholder.com/300x450"
+                });
+            }
+        });
 
-    return items;
+        return items;
+    } catch (err) {
+        console.error("Scraper error:", err);
+        return [];
+    }
 }
 
 // ------------------------------
 // CATALOG HANDLER
 // ------------------------------
 builder.defineCatalogHandler(async ({ type, id }) => {
-    const items = await scrapeAll();
-    return { metas: items };
+    try {
+        const items = await scrapeAll();
+        return { metas: items };
+    } catch (err) {
+        console.error("Catalog handler error:", err);
+        return { metas: [] };
+    }
 });
 
 // ------------------------------
 // STREAM HANDLER
 // ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
-    const fullUrl = BASE + id;
+    try {
+        const fullUrl = BASE + id;
 
-    const res = await axios.get(fullUrl);
-    const $ = cheerio.load(res.data);
+        const res = await axios.get(fullUrl, { timeout: 10000 });
+        const $ = cheerio.load(res.data);
 
-    const magnet = $("a[href*='magnet']").attr("href");
+        const magnet = $("a[href*='magnet']").attr("href");
 
-    if (!magnet) return { streams: [] };
+        if (!magnet) return { streams: [] };
 
-    return {
-        streams: [
-            {
-                title: "Zamunda Magnet",
-                url: magnet
-            }
-        ]
-    };
+        return {
+            streams: [
+                {
+                    title: "Zamunda Magnet",
+                    url: magnet
+                }
+            ]
+        };
+    } catch (err) {
+        console.error("Stream handler error:", err);
+        return { streams: [] };
+    }
 });
 
 // ------------------------------
