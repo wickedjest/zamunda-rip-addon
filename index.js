@@ -63,9 +63,9 @@ async function scrapeAll() {
 }
 
 // ------------------------------
-// CATALOG HANDLER (СТАБИЛЕН)
+// CATALOG HANDLER
 // ------------------------------
-builder.defineCatalogHandler(async ({ type, id }) => {
+builder.defineCatalogHandler(async () => {
     try {
         const items = await scrapeAll();
         return { metas: items };
@@ -76,7 +76,7 @@ builder.defineCatalogHandler(async ({ type, id }) => {
 });
 
 // ------------------------------
-// STREAM HANDLER (СТАБИЛЕН)
+// STREAM HANDLER
 // ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
     try {
@@ -104,11 +104,11 @@ builder.defineStreamHandler(async ({ id }) => {
 });
 
 // ------------------------------
-// EXPRESS SERVER (REQUIRED FOR RENDER)
+// EXPRESS SERVER
 // ------------------------------
 const app = express();
 
-// CORS за Stremio
+// CORS
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     next();
@@ -116,12 +116,10 @@ app.use((req, res, next) => {
 
 const addonInterface = builder.getInterface();
 
-// Manifest
 app.get("/manifest.json", (req, res) => {
     res.json(addonInterface.manifest);
 });
 
-// Catalog / Stream
 app.get("/:resource/:type/:id.json", (req, res) => {
     addonInterface.get(req, res);
 });
