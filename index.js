@@ -5,6 +5,9 @@ const express = require("express");
 
 const BASE = "https://zamunda.rip";
 
+// ------------------------------
+// MANIFEST
+// ------------------------------
 const manifest = {
     id: "community.zamunda.rip.all",
     version: "1.0.0",
@@ -21,6 +24,9 @@ const manifest = {
 
 const builder = new addonBuilder(manifest);
 
+// ------------------------------
+// SCRAPER
+// ------------------------------
 async function scrapeAll() {
     try {
         const res = await axios.get(BASE, { timeout: 10000 });
@@ -49,6 +55,9 @@ async function scrapeAll() {
     }
 }
 
+// ------------------------------
+// CATALOG HANDLER
+// ------------------------------
 builder.defineCatalogHandler(async ({ search }) => {
     try {
         const items = await scrapeAll();
@@ -65,6 +74,9 @@ builder.defineCatalogHandler(async ({ search }) => {
     }
 });
 
+// ------------------------------
+// META HANDLER
+// ------------------------------
 builder.defineMetaHandler(async ({ id }) => {
     return {
         meta: {
@@ -76,6 +88,9 @@ builder.defineMetaHandler(async ({ id }) => {
     };
 });
 
+// ------------------------------
+// STREAM HANDLER
+// ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
     try {
         const fullUrl = BASE + id;
@@ -94,7 +109,14 @@ builder.defineStreamHandler(async ({ id }) => {
     }
 });
 
+// ------------------------------
+// EXPRESS SERVER
+// ------------------------------
 const app = express();
+
+// REQUIRED MIDDLEWARE
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -112,10 +134,12 @@ app.get("/manifest.json", (req, res) => {
     res.json(addonInterface.manifest);
 });
 
+// UNIVERSAL ROUTE
 app.get("/*", (req, res) => {
     addonInterface.get(req, res);
 });
 
+// SUPPRESS NODE CRASHES
 process.on("unhandledRejection", (reason) => {
     console.log("Suppressed unhandled rejection:", reason);
 });
@@ -124,8 +148,8 @@ process.on("uncaughtException", (err) => {
     console.log("Suppressed uncaught exception:", err);
 });
 
+// LISTEN ON 0.0.0.0 FOR RENDER
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log("Addon running on port " + PORT);
 });
-
