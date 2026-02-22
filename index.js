@@ -63,11 +63,20 @@ async function scrapeAll() {
 }
 
 // ------------------------------
-// CATALOG HANDLER
+// UNIVERSAL CATALOG HANDLER
 // ------------------------------
-builder.defineCatalogHandler(async ({ type, id, extra }) => {
+builder.defineCatalogHandler(async ({ type, id, extra, skip, search }) => {
     try {
         const items = await scrapeAll();
+
+        // Stremio може да изпрати search
+        if (search) {
+            const q = search.toLowerCase();
+            return {
+                metas: items.filter(i => i.name.toLowerCase().includes(q))
+            };
+        }
+
         return { metas: items };
     } catch (err) {
         console.error("Catalog handler error:", err);
@@ -76,7 +85,7 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
 });
 
 // ------------------------------
-// META HANDLER (fixes "No handler")
+// META HANDLER
 // ------------------------------
 builder.defineMetaHandler(async ({ type, id, extra }) => {
     return {
