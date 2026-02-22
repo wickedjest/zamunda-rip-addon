@@ -16,7 +16,7 @@ const manifest = {
     logo: "https://www.stremio.com/website/stremio-logo-small.png",
 
     types: ["movie"],
-    resources: ["catalog", "stream"],
+    resources: ["catalog", "stream", "meta"],
 
     catalogs: [
         {
@@ -76,6 +76,20 @@ builder.defineCatalogHandler(async () => {
 });
 
 // ------------------------------
+// META HANDLER (FIXES "No handler" error)
+// ------------------------------
+builder.defineMetaHandler(async ({ id }) => {
+    return {
+        meta: {
+            id,
+            type: "movie",
+            name: "Unknown",
+            poster: "https://via.placeholder.com/300x450"
+        }
+    };
+});
+
+// ------------------------------
 // STREAM HANDLER
 // ------------------------------
 builder.defineStreamHandler(async ({ id }) => {
@@ -125,7 +139,7 @@ app.get("/:resource/:type/:id.json", (req, res) => {
 });
 
 // ------------------------------
-// GLOBAL ERROR HANDLERS (ФИКСВА UNHANDLED REJECTION)
+// GLOBAL ERROR HANDLERS
 // ------------------------------
 process.on("unhandledRejection", (reason) => {
     console.error("GLOBAL Unhandled Rejection:", reason);
