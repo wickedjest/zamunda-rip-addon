@@ -69,7 +69,6 @@ builder.defineCatalogHandler(async ({ type, id, extra, skip, search }) => {
     try {
         const items = await scrapeAll();
 
-        // Stremio може да изпрати search
         if (search) {
             const q = search.toLowerCase();
             return {
@@ -142,7 +141,8 @@ app.get("/manifest.json", (req, res) => {
     res.json(addonInterface.manifest);
 });
 
-app.get("/:resource/:type/:id.json", (req, res) => {
+// UNIVERSAL ROUTE — FIXES ALL "No handler" ERRORS
+app.get("/*", (req, res) => {
     addonInterface.get(req, res);
 });
 
