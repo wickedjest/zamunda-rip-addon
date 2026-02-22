@@ -1,0 +1,11 @@
+node_modules/
+package-lock.json
+dist/
+build/
+.cache/
+.vercel/
+.render-build/
+*.log
+*.tmp
+*.bak
+*.old
